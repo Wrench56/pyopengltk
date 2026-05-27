@@ -31,6 +31,7 @@ class BaseOpenGLFrame(tk.Frame):
             self.tkCreateContext()
             self.initgl()
             self.context_created = True
+            self.after(0, self._display)
 
     def printContext(self, extns=False):
         """ For debugging """
@@ -96,6 +97,10 @@ class BaseOpenGLFrame(tk.Frame):
             self.initgl()
 
     def _display(self):
+        if not self.context_created:
+            if self.animate > 0:
+                self.cb = self.after(self.animate, self._display)
+            return
         self.update_idletasks()
         self.tkMakeCurrent()
         self.redraw()
