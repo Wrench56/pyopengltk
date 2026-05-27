@@ -51,6 +51,9 @@ class OpenGLFrame(BaseOpenGLFrame):
         super().__init__(*args, **kw)
 
     def tkCreateContext(self):
+        self.update_idletasks()
+        self.update()
+
         self.__window = XOpenDisplay(self.winfo_screen().encode('utf-8'))
         # Check glx version:
         major = c_int(0)
@@ -155,9 +158,9 @@ class OpenGLFrame(BaseOpenGLFrame):
                 )
 
     def tkMakeCurrent(self):
-        if self.winfo_ismapped():
+        if self.winfo_ismapped() and hasattr(self, '_OpenGLFrame__window'):
             GLX.glXMakeCurrent(self.__window, self._wid, self.__context)
 
     def tkSwapBuffers(self):
-        if self.winfo_ismapped():
+        if self.winfo_ismapped() and hasattr(self, '_OpenGLFrame__window'):
             GLX.glXSwapBuffers(self.__window, self._wid)
