@@ -52,7 +52,6 @@ class OpenGLFrame(BaseOpenGLFrame):
 
     def tkCreateContext(self):
         self.update_idletasks()
-        self.update()
 
         self.__window = XOpenDisplay(self.winfo_screen().encode('utf-8'))
         # Check glx version:
