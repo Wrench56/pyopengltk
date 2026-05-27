@@ -59,7 +59,7 @@ class OpenGLFrame(BaseOpenGLFrame):
         major = c_int(0)
         minor = c_int(0)
         GLX.glXQueryVersion(self.__window, major, minor)
-        print("GLX version: %d.%d" % (major.value, minor.value))
+        _log.info("GLX version: %d.%d" % (major.value, minor.value))
         if major.value == 1 and minor.value < 3:  # e.g. 1.2 and down
             visual = GLX.glXChooseVisual(self.__window, 0, (GL.GLint * len(att))(* att))
             if not visual:
@@ -77,7 +77,7 @@ class OpenGLFrame(BaseOpenGLFrame):
             XDefaultScreen.argtypes = [POINTER(Display)]
             XDefaultScreen.restype = c_int
             screen = XDefaultScreen(self.__window)
-            print("Screen is ", screen)
+            _log.info("Screen is %s", screen)
             # Look at framebuffer configs
             ncfg = GL.GLint(0)
             cfgs = GLX.glXChooseFBConfig(
@@ -86,7 +86,7 @@ class OpenGLFrame(BaseOpenGLFrame):
                 (GL.GLint * len(fbatt))(* fbatt),
                 ncfg,
             )
-            print("Number of FBconfigs", ncfg.value)
+            _log.info("Number of FBconfigs %s", ncfg.value)
             #
             # Try to match to the current window
             # ... might also be possible to set this for the frame
@@ -97,10 +97,10 @@ class OpenGLFrame(BaseOpenGLFrame):
                 vis = GLX.glXGetVisualFromFBConfig(self.__window,  cfgs[i])
                 if ideal == vis.contents.visualid:
                     best = i
-                    print("Got a matching visual: index %d %d xid %s" % (
+                    _log.info("Got a matching visual: index %d %d xid %s" % (
                         best, vis.contents.visualid, hex(ideal)))
             if best < 0:
-                print("oh dear - visual does not match")
+                _log.info("oh dear - visual does not match")
                 # Take the first in the list (should be another I guess)
                 best = 0
             # Here we insist on RGBA - but didn't check earlier
@@ -111,28 +111,28 @@ class OpenGLFrame(BaseOpenGLFrame):
                 None,  # share list
                 GL.GL_TRUE,  # direct
             )
-            print("Is Direct?: ", GLX.glXIsDirect(self.__window, self.__context))
+            _log.info("Is Direct?: %s", GLX.glXIsDirect(self.__window, self.__context))
             # Not creating another window ... some tutorials do
-            # print("wid: ", self._wid)
+            # _log.info("wid: %s", self._wid)
             # self._wid = GLX.glXCreateWindow(self.__window, cfgs[best], self._wid, None)
-            # print("wid: ", self._wid)
+            # _log.info("wid: %s", self._wid)
             GLX.glXMakeContextCurrent(self.__window, self._wid, self._wid, self.__context)
-            print("Done making a first context")
+            _log.info("Done making a first context")
             extensions = GLX.glXQueryExtensionsString(self.__window, screen)
             # Here we quit - getting a modern context needs further work below
             return
             if "GLX_ARB_create_context" in extensions:
                 # We can try to upgrade it ??
-                print("Trying to upgrade context")
+                _log.info("Trying to upgrade context")
                 s = "glXCreateContextAttribsARB"
                 p = GLX.glXGetProcAddress(c_char_p(s))
 
-                print(p)
+                _log.info(p)
                 if not p:
                     p = GLX.glXGetProcAddressARB((GL.GLubyte * len(s)).from_buffer_copy(s))
-                print(p)
+                _log.info(p)
                 if p:
-                    print(" p is true")
+                    _log.info(" p is true")
                 p.restype = GLX.GLXContext
                 p.argtypes = [
                     POINTER(Display),
