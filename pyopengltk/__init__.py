@@ -25,7 +25,11 @@ import sys
 
 # Platform specific frames
 if sys.platform.startswith('linux'):
-    from pyopengltk.linux import OpenGLFrame
+    import os
+    if os.environ.get('PYOPENGLTK_EGL'):
+        from pyopengltk.egl_x11 import OpenGLFrame
+    else:
+        from pyopengltk.linux import OpenGLFrame
 
 if sys.platform.startswith('win32'):
     from pyopengltk.win32 import OpenGLFrame
