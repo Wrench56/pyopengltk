@@ -18,18 +18,30 @@
 #
 # Large parts copied from pyopengl/Tk/__init__.py
 
-__author__  = "Jon Wright"
-__version__ = "0.0.3"
+__author__  = ("Jon Wright", "Mark Devenyi")
+__version__ = "0.0.5"
 
 import sys
 
 # Platform specific frames
 if sys.platform.startswith('linux'):
     import os
-    if os.environ.get('PYOPENGLTK_EGL'):
+    use_egl = bool(os.environ.get('PYOPENGLTK_EGL'))
+    if 'OpenGL.platform' not in sys.modules:
+        os.environ['PYOPENGL_PLATFORM'] = (
+            'egl' if use_egl else os.environ.get('PYOPENGL_PLATFORM', 'glx')
+        )
+
+    from OpenGL import platform
+    from OpenGL.platform.egl import EGLPlatform
+    from OpenGL.platform.glx import GLXPlatform
+
+    if isinstance(platform.PLATFORM, EGLPlatform):
         from pyopengltk.egl_x11 import OpenGLFrame
-    else:
+    elif isinstance(platform.PLATFORM, GLXPlatform) and not use_egl:
         from pyopengltk.linux import OpenGLFrame
+    else:
+        raise ImportError("Select a matching GLX/EGL backend before importing OpenGL.")
 
 if sys.platform.startswith('win32'):
     from pyopengltk.win32 import OpenGLFrame
