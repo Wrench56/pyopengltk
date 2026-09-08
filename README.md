@@ -69,6 +69,10 @@ pip install .
 
 ## Attributions
 
+### Jon Wright
+
+This repository is a fork of [Jon Wright's project](https://github.com/jonwright/pyopengltk) with some fixes.
+
 Based on the work of others.
 
 ### C + Tcl/Tk example:
